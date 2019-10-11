@@ -1,0 +1,23 @@
+{
+  "name": "floodgate/php-sdk",
+  "description": "PHP SDK for Floodgate, a feature rollout service which provides a centralized management console for managing remote feature flags.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+      {
+          "name": "Floodgate",
+          "email": "support@floodgate.io",
+          "homepage": "https://floodgate.io"
+      }
+  ],
+  "require": {
+    "php": ">=5.3.0",
+    "guzzlehttp/guzzle": "~6.0",
+    "psr/log": "^1.1"
+  },
+  "autoload": {
+    "psr-4": {
+        "FloodgateSDK\\": "src/"
+    }
+  }
+}
