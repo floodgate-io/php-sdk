@@ -13,7 +13,7 @@ This SDK is designed to work with PHP 5.3+
 You can install the Floodgate SDK using Composer
 
 ```
-composer require floodgate/php-sdk
+composer require floodgate/floodgate-php-sdk
 ```
 
 ## Usage
