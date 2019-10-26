@@ -1,5 +1,5 @@
 {
-  "name": "floodgate/php-sdk",
+  "name": "floodgate/floodgate-php-sdk",
   "description": "PHP SDK for Floodgate, a feature rollout service which provides a centralized management console for managing remote feature flags.",
   "type": "library",
   "license": "MIT",

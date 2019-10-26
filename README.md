@@ -52,8 +52,9 @@ To learn more about Floodgate, visit us at https://floodgate.io or contact hello
 Floodgate has currently developed following SDKs.
 
 * .Net Framework [GitHub](https://github.com/floodgate-io/dotnet-framework-sdk)
-* JavaScript [GitHub](https://github.com/floodgate-io/javascript-sdk)
 * PHP [GitHub](https://github.com/floodgate-io/php-sdk)
+* Node [GitHub](https://github.com/floodgate-io/node-sdk)
+* JavaScript [GitHub](https://github.com/floodgate-io/javascript-sdk)
 
 ## Contributing a New SDK
 
