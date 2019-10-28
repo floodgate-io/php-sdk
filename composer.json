@@ -1,8 +1,16 @@
 {
   "name": "floodgate/floodgate-php-sdk",
-  "description": "PHP SDK for Floodgate, a feature rollout service which provides a centralized management console for managing remote feature flags.",
+  "description": "PHP SDK for Floodgate, a cloud service which provides a centralized management console for managing remote feature flags.",
   "type": "library",
   "license": "MIT",
+  "keywords":[
+    "feature flag",
+    "feature toggle",
+    "dark launch",
+    "canary release",
+    "config management",
+    "percentage rollout"
+  ],
   "authors": [
       {
           "name": "Floodgate",

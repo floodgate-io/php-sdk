@@ -5,7 +5,7 @@ namespace FloodgateSDK;
 use FloodgateSDK\Configurations\ClientConfig;
 use GuzzleHttp\Client;
 
-final class HttpResourceservice {
+final class HttpResourceService {
   private $client;
 
   private $config;
