@@ -3,7 +3,7 @@
 1. Create a new Git tag
 
 ```
-git tag v[MAJOR].[MINOR].[PATCH]
+git tag [MAJOR].[MINOR].[PATCH]
 ```
 > Example 1.1.0
 
