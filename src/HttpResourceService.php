@@ -14,11 +14,15 @@ final class HttpResourceService {
 
     $this->config = $config;
     
-    $this->client = new Client([
-      'base_uri' => ClientConfig::CDN_BASEURL,
-      'timeout'  => $config->timeout,
-  ]);
-  
+    try {
+      $this->client = new Client([
+        'base_uri' => ClientConfig::CDN_BASEURL,
+        'timeout'  => $config->timeout,
+      ]);
+    }
+    catch (Exception $e) {
+      throw $e;
+    }
   }
 
   public function Fetch() {

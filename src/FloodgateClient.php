@@ -55,17 +55,22 @@ final class FloodgateClient {
   }
 
   private function refresh() {
-    if ($this->config->cache->isValid()) {
-      $this->config->logger->info("Loading data from cache");
-
-      $this->responseEntity = $this->config->cache->get(self::CACHE_KEY);
+    try {
+      if ($this->config->cache->isValid()) {
+        $this->config->logger->info("Loading data from cache");
+  
+        $this->responseEntity = $this->config->cache->get(self::CACHE_KEY);
+      }
+      else {
+        $this->config->logger->info("Loading data from server");
+  
+        $httpResourceService = new HttpResourceService($this->config);
+        $this->responseEntity = $httpResourceService->Fetch();
+        $this->config->cache->set(self::CACHE_KEY, $this->responseEntity);
+      }
     }
-    else {
-      $this->config->logger->info("Loading data from server");
-
-      $httpResourceService = new HttpResourceService($this->config);
-      $this->responseEntity = $httpResourceService->Fetch();
-      $this->config->cache->set(self::CACHE_KEY, $this->responseEntity);
+    catch (Exception $e) {
+      $this->config->logger->error($e->message);
     }
   }
 
