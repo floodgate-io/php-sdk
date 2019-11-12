@@ -65,8 +65,11 @@ final class FloodgateClient {
         $this->config->logger->info("Loading data from server");
   
         $httpResourceService = new HttpResourceService($this->config);
-        $this->responseEntity = $httpResourceService->Fetch();
-        $this->config->cache->set(self::CACHE_KEY, $this->responseEntity);
+
+        if ($httpResourceService->isReady()) {
+          $this->responseEntity = $httpResourceService->Fetch();
+          $this->config->cache->set(self::CACHE_KEY, $this->responseEntity);
+        }
       }
     }
     catch (Exception $e) {

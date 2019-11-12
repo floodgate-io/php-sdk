@@ -10,6 +10,8 @@ final class HttpResourceService {
 
   private $config;
 
+  private $isReady = false;
+
   function __construct($config, Array $options = []) {
 
     $this->config = $config;
@@ -19,10 +21,17 @@ final class HttpResourceService {
         'base_uri' => ClientConfig::CDN_BASEURL,
         'timeout'  => $config->timeout,
       ]);
+
+      $this->isReady = true;
     }
     catch (Exception $e) {
-      throw $e;
+      // throw $e;
+      $this->isReady = false;
     }
+  }
+
+  public function isReady() {
+    return $this->isReady;
   }
 
   public function Fetch() {
