@@ -17,10 +17,18 @@ class ClientConfig {
 
   public $cache;
 
+  /** @var string A custom URL to fetch config data from. */
+  public $configUrl = null;
+
+  /** @var string A local file location to fetch config data from. */
+  public $configFile = null;
+
   function __construct ($sdkKey, Array $options) {
     $this->SdkKey = $sdkKey;
     $this->timeout = $options['timeout'];
     $this->logger = $options['logger'];
     $this->cache = $options['cache'];
+    $this->configUrl = $options['configUrl'];
+    $this->configFile = $options['configFile'];
   }
 }

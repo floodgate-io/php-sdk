@@ -27,5 +27,8 @@
     "psr-4": {
         "FloodgateSDK\\": "src/"
     }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "8"
   }
 }

@@ -32,15 +32,7 @@ class Evaluator {
     // Check to see if there is a User object
     // Without an User object we cannot evaluate rollouts or targets
     if ($user == null) {
-
       $config->logger->debug("No user data found, unable to evaluate rollouts and targets");
-
-      if ($flag['is_rollout']) {
-        // Log the default value because we cannot evaluate without a User
-        $config->logger->debug("Rollout enabled but no user data found, delivering defaultValue");
-        return $defaultValue;
-      }
-
       return $flag['value'];
     }
 
@@ -49,7 +41,7 @@ class Evaluator {
       if ($flag['is_rollout']) {
         $config->logger->debug("Targeting not enabled, evaluating rollouts");
         // Evaluate rollout
-        return self::EvaluateRollouts($key, $user, $flag['rollouts'], $defaultValue, $config->logger);
+        return self::EvaluateRollouts($key, $user, $flag['rollouts'], $flag['value'], $config->logger);
       }
 
       $config->logger->debug("Targeting and rollouts not enabled, delivering flag value");
@@ -59,7 +51,8 @@ class Evaluator {
     if (!empty($flag['targets'])) {
       $config->logger->debug("Targeting enabled, evaluatng targets");
 
-      return self::EvaluateTargets($key, $user, $flag['targets'], $flag['value'], $config->logger);
+      // return self::EvaluateTargets($key, $user, $flag['targets'], $flag['value'], $config->logger);
+      return self::EvaluateTargets($key, $user, $flag, $flag['value'], $config->logger);
     }
 
     $config->logger->debug("No data found, returning default value");
@@ -92,12 +85,13 @@ class Evaluator {
     return $rolloutValue;
   }
 
-  private static function EvaluateTargets($key, $user, $targets, $defaultValue, $logger) {
-    $validRuleCount = 0;
-
+  private static function EvaluateTargets($key, $user, $flag, $defaultValue, $logger) {
     $valid = false;
 
-    foreach($targets as $target) {
+    $targets = $flag['targets'];
+
+    foreach($targets as $index => $target) {
+      $validRuleCount = 0;
 
       $rulesCount = count($target['rules']);
 
@@ -142,19 +136,25 @@ class Evaluator {
             }
             break;
         }
+
         $validRuleCount = $validRuleCount + $isRuleValid;
       }
-      
+
       if ($validRuleCount == $rulesCount) {
         if ($target['is_rollout']) {
           // Evaluate rollout
           return self::EvaluateRollouts($key, $user, $target['rollouts'], $defaultValue, $logger);
         }
-  
+
         return $target['value'];
       }
-  
-      return $defaultValue;
     }
+
+    if ($flag['is_rollout']) {
+      // Evaluate rollout
+      return self::EvaluateRollouts($key, $user, $flag['rollouts'], $defaultValue, $logger);
+    }
+
+    return $defaultValue;
   }
 }

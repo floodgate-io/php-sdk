@@ -18,14 +18,14 @@ final class HttpResourceService {
     
     try {
       $this->client = new Client([
-        'base_uri' => ClientConfig::CDN_BASEURL,
+        // 'base_uri' => ClientConfig::CDN_BASEURL,
         'timeout'  => $config->timeout,
       ]);
 
       $this->isReady = true;
     }
     catch (Exception $e) {
-      // throw $e;
+      // log $e->getMessage();
       $this->isReady = false;
     }
   }
@@ -41,7 +41,7 @@ final class HttpResourceService {
       ]
     ];
 
-    $url = $this->urlBuilder();
+    $url = $this->buildUrl();
     
     $response = $this->client->request('GET', $url, $options);
 
@@ -54,17 +54,21 @@ final class HttpResourceService {
     }
 
     return new ResponseEntity(ResponseEntity::INVALID);
-
-    // Print all response headers
-    // foreach ($response->getHeaders() as $name => $values) {
-    //   echo $name . ': ' . implode(', ', $values) . "\r\n";
-    // }
-
-    
   }
 
-  private function urlBuilder() {
+  private function buildUrl() {
     $apiVersion = ClientConfig::API_VERSION;
-    return "environment-files/{$this->config->SdkKey}/{$apiVersion}/flags-config.json";
+    
+    $baseUrl = ClientConfig::CDN_BASEURL;
+    
+    if (!empty($this->config->configUrl)) {
+      $baseUrl = $this->config->configUrl;
+    }
+
+    $url = "{$baseUrl}/environment-files/{$this->config->SdkKey}/{$apiVersion}/flags-config.json";
+
+    $this->config->logger->info($url);
+
+    return $url;
   }
 }

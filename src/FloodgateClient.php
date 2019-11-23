@@ -44,6 +44,16 @@ final class FloodgateClient {
       $configOptions['timeout'] = 10; // Set the default http request timeout
     }
 
+    $configOptions['configUrl'] = null;
+    if (!empty($options['configUrl'])) {
+      $configOptions['configUrl'] = $options['configUrl'];
+    }
+
+    $configOptions['configFile'] = null;
+    if (!empty($options['configFile'])) {
+      $configOptions['configFile'] = $options['configFile'];
+    }
+
     // Create a new config object
     $this->config = new ClientConfig($sdkKey, $configOptions);
 
@@ -56,20 +66,42 @@ final class FloodgateClient {
 
   private function refresh() {
     try {
+      // Check cache
       if ($this->config->cache->isValid()) {
         $this->config->logger->info("Loading data from cache");
   
         $this->responseEntity = $this->config->cache->get(self::CACHE_KEY);
-      }
-      else {
-        $this->config->logger->info("Loading data from server");
-  
-        $httpResourceService = new HttpResourceService($this->config);
 
-        if ($httpResourceService->isReady()) {
-          $this->responseEntity = $httpResourceService->Fetch();
+        return;
+      }
+
+      // Check local file
+      if (!empty($this->config->configFile)) {
+        $this->config->logger->info("Attempting to load data from local file : {$this->config->configFile}");
+        
+        if (file_exists($this->config->configFile)) {
+          $this->config->logger->info("Local file found");
+
+          $json = file_get_contents($this->config->configFile);
+
+          // $this->config->logger->info($json);
+
+          $body = json_decode($json, true);
+          
+          $this->responseEntity =  new ResponseEntity(ResponseEntity::VALID, $body);
+
           $this->config->cache->set(self::CACHE_KEY, $this->responseEntity);
+          return;
         }
+      }
+
+      // Check server
+      $this->config->logger->info("Loading data from server");
+      $httpResourceService = new HttpResourceService($this->config);
+
+      if ($httpResourceService->isReady()) {
+        $this->responseEntity = $httpResourceService->Fetch();
+        $this->config->cache->set(self::CACHE_KEY, $this->responseEntity);
       }
     }
     catch (Exception $e) {
