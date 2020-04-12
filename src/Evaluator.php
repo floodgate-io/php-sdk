@@ -5,12 +5,13 @@ namespace FloodgateSDK;
 class Evaluator {
   const COMPARATOR_EQUAL_TO         = 1;
   const COMPARATOR_NOT_EQUAL_TO     = 2;
-  const COMPARATOR_GREATOR          = 3;
-  const COMPARATOR_GREATOR_EQUAL_TO = 4;
+  const COMPARATOR_GREATER          = 3;
+  const COMPARATOR_GREATER_EQUAL_TO = 4;
   const COMPARATOR_LESS             = 5;
   const COMPARATOR_LESS_EQUAL_TO    = 6;
   const COMPARATOR_CONTAINS         = 7;
   const COMPARATOR_NOT_CONTAIN      = 8;
+  const COMPARATOR_ENDS_WITH        = 9;
 
   public static function Evaluate($key, $flags, $config, $defaultValue, User $user = null) {
 
@@ -97,6 +98,7 @@ class Evaluator {
 
       foreach($target['rules'] as $rule) {
         $isRuleValid = 0;
+        
         $userAttributeValue = $user->GetAttributeValue($rule['attribute']);
 
         if (empty($userAttributeValue)) {
@@ -105,14 +107,66 @@ class Evaluator {
 
         switch ($rule['comparator']) {
           case self::COMPARATOR_EQUAL_TO:
-            $logger->debug("Evaluating target of type equal");
+            $logger->debug("Evaluating target of type equal for $userAttributeValue");
 
-            $isRuleValid = (int) in_array($userAttributeValue, $rule['values']);
+            $isRuleValid = (int) in_array(strtolower($userAttributeValue), $rule['values']);
             break;
           case self::COMPARATOR_NOT_EQUAL_TO:
-          $logger->debug("Evaluating target of type not equal");
+            $logger->debug("Evaluating target of type not equal");
 
-            $isRuleValid = (int) !in_array($userAttributeValue, $rule['values']);
+            $isRuleValid = (int) !in_array(strtolower($userAttributeValue), $rule['values']);
+            break;
+          case self::COMPARATOR_GREATER:
+            $logger->debug("Evaluating target of greater than");
+            // There should only ever be a single value
+            
+            if (empty($rule['values'][0])) {
+              $logger->debug("No rule value found");
+              break;
+            }
+
+            $value = $rule['values'][0];
+
+            $isRuleValid = (double)$userAttributeValue > (double)$value;
+            break;
+          case self::COMPARATOR_GREATER_EQUAL_TO:
+            $logger->debug("Evaluating target of greater than or equal to");
+            // There should only ever be a single value
+            
+            if (empty($rule['values'][0])) {
+              $logger->debug("No rule value found");
+              break;
+            }
+
+            $value = $rule['values'][0];
+
+            $isRuleValid = (double)$userAttributeValue >= (double)$value;
+            break;
+          case self::COMPARATOR_LESS:
+            $logger->debug("Evaluating target of less than");
+            // There should only ever be a single value
+            
+            if (empty($rule['values'][0])) {
+              $logger->debug("No rule value found");
+              break;
+            }
+
+            $value = $rule['values'][0];
+
+            $isRuleValid = (double)$userAttributeValue < (double)$value;
+            break;
+          case self::COMPARATOR_LESS_EQUAL_TO:
+            $logger->debug("Evaluating target of less than or equal to");
+            // There should only ever be a single value
+            
+            if (empty($rule['values'][0])) {
+              $logger->debug("No rule value found");
+              break;
+            }
+
+            $value = $rule['values'][0];
+
+            $isRuleValid = (double)$userAttributeValue <= (double)$value;
             break;
           case self::COMPARATOR_CONTAINS:
             $logger->debug("Evaluating target of type contains");
@@ -131,6 +185,16 @@ class Evaluator {
             foreach($rule['values'] as $value) {
               if (strpos($userAttributeValue, $value) !== false) {
                 $isRuleValid = 0;
+                break;
+              }
+            }
+            break;
+          case self::COMPARATOR_ENDS_WITH:
+            $logger->debug("Evaluating target of type ends with");
+
+            foreach($rule['values'] as $value) {
+              if (self::endsWith(strtolower($userAttributeValue), $value)) {
+                $isRuleValid = 1;
                 break;
               }
             }
@@ -156,5 +220,14 @@ class Evaluator {
     }
 
     return $defaultValue;
+  }
+
+  private function endsWith($string, $endString) 
+  { 
+      $len = strlen($endString); 
+      if ($len == 0) { 
+          return true; 
+      } 
+      return (substr($string, -$len) === $endString); 
   }
 }
