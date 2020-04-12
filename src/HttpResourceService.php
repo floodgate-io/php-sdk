@@ -4,6 +4,7 @@ namespace FloodgateSDK;
 
 use FloodgateSDK\Configurations\ClientConfig;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 final class HttpResourceService {
   private $client;
@@ -18,13 +19,12 @@ final class HttpResourceService {
     
     try {
       $this->client = new Client([
-        // 'base_uri' => ClientConfig::CDN_BASEURL,
         'timeout'  => $config->timeout,
       ]);
 
       $this->isReady = true;
     }
-    catch (Exception $e) {
+    catch (GuzzleException $e) {
       // log $e->getMessage();
       $this->isReady = false;
     }
@@ -37,22 +37,32 @@ final class HttpResourceService {
   public function Fetch() {
     $options = [
       'headers' => [
-        'X-FloodGate-SDK-Agent' => 'php-v' . ClientConfig::SDK_VERSION
+        'X-FloodGate-SDK-Agent' => 'PHP',
+        'X-FloodGate-SDK-Version' => ClientConfig::SDK_VERSION
       ]
     ];
 
     $url = $this->buildUrl();
     
-    $response = $this->client->request('GET', $url, $options);
+    try
+    {
+      $response = $this->client->request('GET', $url, $options);
 
-    // Check ETag - if not changed return from cache
+      $statusCode = $response->getStatusCode();
 
-    $statusCode = $response->getStatusCode();
-    if ($statusCode == 200) {
-      $body = json_decode($response->getBody(), true);
-      return new ResponseEntity(ResponseEntity::VALID, $body);
+      if ($statusCode == 200) {
+        $body = json_decode($response->getBody(), true);
+
+        return new ResponseEntity(ResponseEntity::VALID, $body);
+      }
     }
-
+    catch (GuzzleException $e) {
+      $this->isReady = false;
+    }
+    catch (Exception $e) {
+      $this->isReady = false;
+    }
+    
     return new ResponseEntity(ResponseEntity::INVALID);
   }
 

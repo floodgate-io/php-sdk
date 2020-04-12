@@ -84,8 +84,6 @@ final class FloodgateClient {
 
           $json = file_get_contents($this->config->configFile);
 
-          // $this->config->logger->info($json);
-
           $body = json_decode($json, true);
           
           $this->responseEntity =  new ResponseEntity(ResponseEntity::VALID, $body);
